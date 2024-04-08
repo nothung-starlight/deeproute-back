@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0.3//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.deeproute.Dao.LabelDao">
+    <resultMap id="Label" type="com.example.deeproute.Model.Label">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="history_id" jdbcType="INTEGER" property="history_id" />
+        <result column="time" jdbcType="TIMESTAMP" property="time" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+
+    </resultMap>
+    <insert id="insertLabel" parameterType="com.example.deeproute.Model.Label"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO label(history_id, time, name)
+        VALUES (#{history_id}, #{time}, #{name})
+
+    </insert>
+    <select id="getRecentLabel" resultMap="Label">
+        select * from deeproute.public.label where time <![CDATA[<=]]> #{timestamp} and history_id = #{id} order by time desc limit 1
+    </select>
+
+</mapper>

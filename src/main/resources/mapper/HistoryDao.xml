@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0.3//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.deeproute.Dao.HistoryDao">
+    <resultMap id="History" type="com.example.deeproute.Model.History">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="location" jdbcType="VARCHAR" property="location" />
+        <result column="time" jdbcType="TIMESTAMP" property="time" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="brand" jdbcType="VARCHAR" property="brand" />
+        <result column="model" jdbcType="VARCHAR" property="model" />
+        <result column="version" jdbcType="VARCHAR" property="version" />
+        <result column="path" jdbcType="VARCHAR" property="path" />
+        <result column="info" jdbcType="LONGVARCHAR" property="info" />
+        <result column="source" jdbcType="VARCHAR" property="source" />
+    </resultMap>
+    <insert id="insertHistory" parameterType="com.example.deeproute.Model.History"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO history(location, time,
+        name, brand, model, version, path, info, source)
+        VALUES (#{location}, #{time}, #{name},
+        #{brand}, #{model}, #{version}, #{path}, #{info}, #{source})
+
+    </insert>
+    <select id="getHistoryList" resultMap="History">
+        SELECT * FROM history
+        WHERE 1=1
+        <if test="location != null and location != ''">
+            AND location LIKE CONCAT('%', #{location}, '%')
+        </if>
+        <if test="date != null and date != ''">
+            AND DATE(time) = TO_DATE(#{date}, 'YYYY-MM-DD')
+        </if>
+        <if test="name != null and name != ''">
+            AND name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="brand != null and brand != ''">
+            AND brand LIKE CONCAT('%', #{brand}, '%')
+        </if>
+        <if test="model != null and model != ''">
+            AND model LIKE CONCAT('%', #{model}, '%')
+        </if>
+        <if test="version != null and version != ''">
+            AND version LIKE CONCAT('%', #{version}, '%')
+        </if>
+        <if test="path != null and path != ''">
+            AND path LIKE CONCAT('%', #{path}, '%')
+        </if>
+        <!-- 分页 -->
+        LIMIT 10 OFFSET (#{currentPage}-1)*10
+    </select>
+
+    <select id="getResultCnt" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM history
+        WHERE 1=1
+        <if test="location != null and location != ''">
+            AND location LIKE CONCAT('%', #{location}, '%')
+        </if>
+        <if test="date != null and date != ''">
+            AND DATE(time) = TO_DATE(#{date}, 'YYYY-MM-DD')
+        </if>
+        <if test="name != null and name != ''">
+            AND name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="brand != null and brand != ''">
+            AND brand LIKE CONCAT('%', #{brand}, '%')
+        </if>
+        <if test="model != null and model != ''">
+            AND model LIKE CONCAT('%', #{model}, '%')
+        </if>
+        <if test="version != null and version != ''">
+            AND version LIKE CONCAT('%', #{version}, '%')
+        </if>
+        <if test="path != null and path != ''">
+            AND path LIKE CONCAT('%', #{path}, '%')
+        </if>
+    </select>
+    <select id="getHistoryById" resultMap="History">
+        SELECT * FROM history
+        WHERE id=#{id}
+    </select>
+    <delete id="deleteHistory">
+        DELETE FROM label_info
+        WHERE label_id IN (
+        SELECT id FROM label WHERE history_id = #{id}
+        );
+
+        <!-- 删除 label 表中对应 history 的记录 -->
+        DELETE FROM label
+        WHERE history_id = #{id};
+
+        <!-- 最后删除 history 表中的记录 -->
+        DELETE FROM history
+        WHERE id = #{id};
+    </delete>
+
+</mapper>

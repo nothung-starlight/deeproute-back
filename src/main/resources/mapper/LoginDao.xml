@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0.3//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.deeproute.Dao.LoginDao">
+
+
+    <resultMap id="Login" type="com.example.deeproute.Model.Login">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="username" jdbcType="VARCHAR" property="username" />
+        <result column="password" jdbcType="VARCHAR" property="password" />
+
+    </resultMap>
+
+    <select id="getLoginInfo" resultMap="Login">
+        select * from login where id=1
+    </select>
+    <update id="update">
+        update login set username=#{username} , password=#{password} where id=1
+    </update>
+    <insert id="initialize">
+        insert into login(id,username,password) values (1,'deeproute','deeproute888')
+    </insert>
+
+</mapper>

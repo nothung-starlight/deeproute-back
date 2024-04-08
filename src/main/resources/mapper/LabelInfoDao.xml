@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0.3//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.deeproute.Dao.LabelInfoDao">
+    <resultMap id="LabelInfo" type="com.example.deeproute.Model.LabelInfo">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="label_id" jdbcType="INTEGER" property="label_id" />
+        <result column="info" jdbcType="LONGVARCHAR" property="info" />
+        <result column="source" jdbcType="VARCHAR" property="source" />
+
+    </resultMap>
+    <insert id="insertLabelInfo" parameterType="com.example.deeproute.Model.LabelInfo"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO label_info(label_id, info, source)
+        VALUES (#{label_id}, #{info}, #{source})
+
+    </insert>
+
+
+</mapper>

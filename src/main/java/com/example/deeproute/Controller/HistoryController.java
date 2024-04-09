@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Timestamp;
@@ -139,7 +140,15 @@ public class HistoryController {
                                         Date parsedDate = dateFormat.parse(file.getName());
                                         Timestamp timestamp = new Timestamp(parsedDate.getTime());
                                         labelInfo.setLabel_id(labelService.getRecentLabel(timestamp,history_id).getId());
-                                        //todo:语音识别
+                                        ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "python", "src/main/python/test.py", file.getPath());
+                                        pb.redirectErrorStream(true);
+                                        Process process = pb.start();
+                                        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
+                                        String line;
+                                        while ((line = reader.readLine()) != null) {
+                                            labelInfo.setInfo(line);
+                                            System.out.println(line);
+                                        }
                                         labelInfoService.insertLabelInfo(labelInfo);
                                     }
                                 }

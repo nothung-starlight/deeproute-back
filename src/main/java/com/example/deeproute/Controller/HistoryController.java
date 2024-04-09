@@ -140,14 +140,19 @@ public class HistoryController {
                                         Date parsedDate = dateFormat.parse(file.getName());
                                         Timestamp timestamp = new Timestamp(parsedDate.getTime());
                                         labelInfo.setLabel_id(labelService.getRecentLabel(timestamp,history_id).getId());
-                                        ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "python", "src/main/python/test.py", file.getPath());
-                                        pb.redirectErrorStream(true);
-                                        Process process = pb.start();
-                                        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
-                                        String line;
-                                        while ((line = reader.readLine()) != null) {
-                                            labelInfo.setInfo(line);
-                                            System.out.println(line);
+                                        try{
+                                            ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "python", "src/main/python/test.py", file.getPath());
+                                            pb.redirectErrorStream(true);
+                                            Process process = pb.start();
+                                            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
+                                            String line;
+                                            while ((line = reader.readLine()) != null) {
+                                                labelInfo.setInfo(line);
+                                                System.out.println(line);
+                                            }
+                                        }
+                                        catch (Exception e){
+                                            e.printStackTrace();
                                         }
                                         labelInfoService.insertLabelInfo(labelInfo);
                                     }

@@ -24,7 +24,7 @@ public class LoginController {
     @Resource
     RedisTemplate<String,Object> redisTemplate;
 
-    @CrossOrigin(origins = "http://10.26.63.208:3000", allowCredentials = "true")
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
     @RequestMapping(value = "/check", method = RequestMethod.POST, produces = "application/json;charset=utf-8",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<String> check(@RequestParam("username") String username,
                                 @RequestParam("password") String password, HttpServletResponse response) {
@@ -43,7 +43,7 @@ public class LoginController {
         }
     }
 
-    @CrossOrigin(origins = "http://10.26.63.208:3000", allowCredentials = "true")
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
     @RequestMapping(value = "/update", method = RequestMethod.POST, produces = "application/json;charset=utf-8",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<String> update(@RequestParam("username") String username,
                                  @RequestParam("password") String password,
@@ -59,7 +59,7 @@ public class LoginController {
 
     }
 
-    @CrossOrigin(origins = "http://10.26.63.208:3000", allowCredentials = "true")
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
     @RequestMapping(value = "/checkCookie",method = RequestMethod.GET,produces = "application/json;charset=utf-8")
     public Result<String> checkCookie(@CookieValue(value = "login-cookie" , defaultValue = "") String cookie) {
         if (Boolean.TRUE.equals(redisTemplate.hasKey(cookie))){

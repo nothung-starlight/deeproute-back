@@ -27,11 +27,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static com.example.deeproute.DeeprouteApplication.historyPath;
+
 @RestController
 @RequestMapping(value = "/history")
 public class HistoryController {
     private static int currentHistoryId=1;
-    public static String historyPath = System.getProperty("user.dir") + File.separator + "historyFiles" + File.separator;
+
     @Resource
     HistoryService historyService;
     @Resource
@@ -41,7 +43,7 @@ public class HistoryController {
     @Resource
     RedisTemplate<String, Object> redisTemplate;
 
-    @CrossOrigin(origins = "http://10.26.63.208:3000", allowCredentials = "true")
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
     @RequestMapping(value = "/upload", method = RequestMethod.POST, produces = "application/json;charset=utf-8", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<String> upload(@RequestParam("location") String location,
                                  @RequestParam("name") String name,
@@ -175,7 +177,7 @@ public class HistoryController {
         return Result.error(-1, "");
     }
 
-    @CrossOrigin(origins = "http://10.26.63.208:3000", allowCredentials = "true")
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
     @RequestMapping(value = "/getHistoryList", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
     public Result<HistoryList> getHistoryList(@RequestParam(value = "location",defaultValue = "") String location,
                                           @RequestParam(value = "date",defaultValue = "") String date,
@@ -200,7 +202,7 @@ public class HistoryController {
         return Result.error(-1, "");
     }
 
-    @CrossOrigin(origins = "http://10.26.63.208:3000", allowCredentials = "true")
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
     @RequestMapping(value = "/setCurrentHistoryId", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
     public Result<String> setCurrentHistoryId(@RequestParam(value = "id",defaultValue = "1") int id,
                                         @CookieValue(value = "login-cookie", defaultValue = "") String cookie)  {
@@ -218,7 +220,7 @@ public class HistoryController {
         }
         return Result.error(-1, "");
     }
-    @CrossOrigin(origins = "http://10.26.63.208:3000", allowCredentials = "true")
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
     @RequestMapping(value = "/deleteHistory", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
     public Result<String> deleteHistory(@RequestParam(value = "id",defaultValue = "-1") int id,
                                         @CookieValue(value = "login-cookie", defaultValue = "") String cookie)  {

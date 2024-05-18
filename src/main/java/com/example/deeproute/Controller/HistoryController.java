@@ -28,6 +28,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static com.example.deeproute.DeeprouteApplication.historyPath;
+import static com.example.deeproute.DeeprouteApplication.runCommand;
 
 @RestController
 @RequestMapping(value = "/history")
@@ -143,15 +144,7 @@ public class HistoryController {
                                         Timestamp timestamp = new Timestamp(parsedDate.getTime());
                                         labelInfo.setLabel_id(labelService.getRecentLabel(timestamp,history_id).getId());
                                         try{
-                                            ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "python", "src/main/python/test.py", file.getPath());
-                                            pb.redirectErrorStream(true);
-                                            Process process = pb.start();
-                                            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
-                                            String line;
-                                            while ((line = reader.readLine()) != null) {
-                                                labelInfo.setInfo(line);
-                                                System.out.println(line);
-                                            }
+                                            runCommand("cmd /c python src/main/python/test.py "+file.getPath());
                                         }
                                         catch (Exception e){
                                             e.printStackTrace();

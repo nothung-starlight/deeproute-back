@@ -24,6 +24,7 @@ public class DeeprouteApplication {
 //		System.setOut(printStream);
 
 		try {
+			runCommand("cmd /c python -m pip install whisper");
 			// 读取文件内容并存储到historyPath变量中
 			historyPath = new String(Files.readAllBytes(Paths.get("path.txt")))+ File.separator + "historyFiles" + File.separator;
 			// 打印读取的文件内容
@@ -38,5 +39,15 @@ public class DeeprouteApplication {
 		}
 		SpringApplication.run(DeeprouteApplication.class, args);
 	}
+	public static void runCommand(String command) throws IOException {
+		ProcessBuilder pb = new ProcessBuilder("cmd", "/c", command);
+		pb.redirectErrorStream(true);
+		Process process = pb.start();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		String line;
+		while ((line = reader.readLine()) != null) {
+			System.out.println(line);
+		}
 
+	}
 }

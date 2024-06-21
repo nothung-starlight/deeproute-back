@@ -14,6 +14,8 @@
         VALUES (#{label_id}, #{info}, #{source})
 
     </insert>
-
+    <select id="getLabelInfo" resultMap="LabelInfo">
+        select * from deeproute.public.label_info where id = #{    }
+    </select>
 
 </mapper>

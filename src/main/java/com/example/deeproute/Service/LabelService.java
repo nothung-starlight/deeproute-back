@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class LabelService {
@@ -19,5 +21,8 @@ public class LabelService {
     }
     public Label getRecentLabel(Timestamp timestamp,int id){
         return labelDao.getRecentLabel(timestamp, id);
+    }
+    public List<Label> getAllLabel(int id){
+        return  labelDao.getAllLabel(id);
     }
 }

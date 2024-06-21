@@ -17,5 +17,7 @@
     <select id="getRecentLabel" resultMap="Label">
         select * from deeproute.public.label where time <![CDATA[<=]]> #{timestamp} and history_id = #{id} order by time desc limit 1
     </select>
-
+    <select id="getAllLabel" resultMap="Label">
+        select * from deeproute.public.label where history_id = #{id} order by time
+    </select>
 </mapper>

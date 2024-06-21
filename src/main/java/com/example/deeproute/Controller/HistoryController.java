@@ -21,14 +21,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import static com.example.deeproute.DeeprouteApplication.historyPath;
-import static com.example.deeproute.DeeprouteApplication.runCommand;
+import static com.example.deeproute.config.WebConfig.historyPath;
+
 
 @RestController
 @RequestMapping(value = "/history")
@@ -144,7 +146,15 @@ public class HistoryController {
                                         Timestamp timestamp = new Timestamp(parsedDate.getTime());
                                         labelInfo.setLabel_id(labelService.getRecentLabel(timestamp,history_id).getId());
                                         try{
-                                            runCommand("cmd /c python src/main/python/test.py "+file.getPath());
+                                            ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "python", "audio.py", file.getPath());
+                                            pb.redirectErrorStream(true);
+                                            Process process = pb.start();
+                                            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
+                                            String line;
+                                            while ((line = reader.readLine()) != null) {
+                                                labelInfo.setInfo(line);
+                                                System.out.println(line);
+                                            }
                                         }
                                         catch (Exception e){
                                             e.printStackTrace();
@@ -236,6 +246,20 @@ public class HistoryController {
         }
         return Result.error(-1, "");
     }
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+    @RequestMapping(value = "/initialize", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+    public Result<History> initialize(@CookieValue(value = "login-cookie", defaultValue = "") String cookie)  {
+        try {
+            if (Boolean.TRUE.equals(redisTemplate.hasKey(cookie))) {
+                redisTemplate.expire(cookie, 1, TimeUnit.HOURS);
+                return Result.ok(historyService.getHistoryById(currentHistoryId));
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return Result.error(-1, "");
+    }
 
     public static String unzip(File zipFile, File destDir) {
         String name = "";
@@ -294,6 +318,110 @@ public class HistoryController {
         catch (Exception e){
             e.printStackTrace();
         }
+    }
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+    @RequestMapping(value = "/getAccelerate", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+    public Result<AccelerateJson> getAccelerate(@CookieValue(value = "login-cookie", defaultValue = "") String cookie)  {
+        try {
+            if (Boolean.TRUE.equals(redisTemplate.hasKey(cookie))) {
+                Gson gson = new Gson();
+                History history=historyService.getHistoryById(currentHistoryId);
+
+                File file = new File(historyPath+history.getSource()+"accelerate.txt"); // 替换为你的JSON文件路径
+                BufferedReader reader = new BufferedReader(new FileReader(file));
+                StringBuilder jsonContent = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    jsonContent.append(line);
+                }
+
+                reader.close();
+                AccelerateJson accelerates = gson.fromJson(jsonContent.toString(), AccelerateJson.class);
+                return Result.ok(accelerates);
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return Result.error(-1, "");
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+    @RequestMapping(value = "/getLane", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+    public Result<Lanes> getLane(@CookieValue(value = "login-cookie", defaultValue = "") String cookie)  {
+        try {
+            if (Boolean.TRUE.equals(redisTemplate.hasKey(cookie))) {
+                Gson gson = new Gson();
+                History history=historyService.getHistoryById(currentHistoryId);
+
+                File file = new File(historyPath+history.getSource()+"lane.txt"); // 替换为你的JSON文件路径
+                BufferedReader reader = new BufferedReader(new FileReader(file));
+                StringBuilder jsonContent = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    jsonContent.append(line);
+                }
+
+                reader.close();
+                Lanes lanes = gson.fromJson(jsonContent.toString(), Lanes.class);
+                return Result.ok(lanes);
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return Result.error(-1, "");
+    }
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+    @RequestMapping(value = "/getHistory", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+    public Result<History> getHistory(@CookieValue(value = "login-cookie", defaultValue = "") String cookie)  {
+        try {
+            if (Boolean.TRUE.equals(redisTemplate.hasKey(cookie))) {
+                History history=historyService.getHistoryById(currentHistoryId);
+                return Result.ok(history);
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return Result.error(-1, "");
+    }
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+    @RequestMapping(value = "/getLabel", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+    public Result<Label> getLabel(@RequestParam(value = "duration",defaultValue = "") int duration,
+            @CookieValue(value = "login-cookie", defaultValue = "") String cookie)  {
+        try {
+            if (Boolean.TRUE.equals(redisTemplate.hasKey(cookie))) {
+                History history=historyService.getHistoryById(currentHistoryId);
+                // Assuming 'duration' is in milliseconds
+                long durationInMillis = history.getTime().getTime() + duration;
+
+                Timestamp timestamp = new Timestamp(durationInMillis);
+
+                Label label = labelService.getRecentLabel(timestamp, currentHistoryId);
+                return Result.ok(label);
+
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return Result.error(-1, "");
+    }
+    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+    @RequestMapping(value = "/getAllLabel", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+    public Result<List<Label>> getAllLabel(@CookieValue(value = "login-cookie", defaultValue = "") String cookie)  {
+        try {
+            if (Boolean.TRUE.equals(redisTemplate.hasKey(cookie))) {
+                return Result.ok(labelService.getAllLabel(currentHistoryId));
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return Result.error(-1, "");
     }
 
 }
